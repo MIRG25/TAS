@@ -1,0 +1,71 @@
+# Common UCSF-PDGM configuration for supervised downstream baselines.
+experiment:
+  name: supervised_baseline
+  description: MRI-only supervised baseline used to evaluate future foundation encoders
+
+data:
+  data_root: ../../data/UCSF-PDGM-v3
+  metadata_csv: ../../data/UCSF-PDGM-v3/UCSF-PDGM-metadata_v2.csv
+  cache_dir: artifacts/cache_full240x240x155
+  roi_mode: full_volume
+  # Source XYZ=240x240x155 is stored as C/D/H/W=4x155x240x240.
+  cache_shape: [155, 240, 240]
+  cache_dtype: float16
+  crop_shape: [128, 128, 128]
+  random_crop:
+    enabled: true
+    tumor_guided_probability: 1.0
+    min_tumor_retention: 0.70
+    tumor_center_jitter_voxels: 24
+    min_brain_fraction: 0.30
+    attempts: 32
+  use_tumor_mask_for_crop: true
+  num_workers: 4
+
+split:
+  n_splits: 5
+  seed: 2026
+  validation_fraction: 0.20
+  validation_seed: 2027
+
+validation:
+  interval: 1
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 50
+  min_epochs: 100
+  min_delta: 0.0001
+
+model:
+  base_channels: 24
+  feature_dim: 192
+  adapter_dim: 48
+  dropout: 0.20
+  pooling: average
+  attention_hidden_channels: 64
+  feature_norm: false
+  survival_bins: 12
+  survival_cutpoints_days: [180, 365, 540, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3650]
+
+training:
+  seed: 2026
+  tasks: [idh, who, survival]
+  epochs: 200
+  batch_size: 2
+  learning_rate: 0.0002
+  weight_decay: 0.00001
+  amp: true
+  classification_loss: weighted_ce
+  output_dir: runs
+
+evaluation:
+  save_patient_predictions: true
+  save_validation_outputs: false
+  save_validation_predictions: false
+  integrated_auc_time_range_days: [365, 1825]
+  integrated_brier_time_range_days: [365, 1825]
+  survival_auc_horizons_days: [365, 1095, 1825]
+  survival_risk_horizon_days: 1825
+  significance_permutations: 10000
+  significance_bootstrap_repetitions: 10000
+  significance_seed: 2026
+  significance_alpha: 0.05

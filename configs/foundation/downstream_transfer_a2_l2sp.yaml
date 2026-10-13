@@ -1,0 +1,15 @@
+base_config: downstream_transfer_stable.yaml
+
+experiment:
+  name: foundation_transfer_a2_l2sp
+
+training:
+  # A2 is a single-variable ablation over the recovered raw-model baseline.
+  # The normalized L2-SP term limits destructive drift from the task-agnostic
+  # MAE initialization while remaining independent of endpoint loss scale.
+  mae_anchor:
+    enabled: true
+    weight: 10.0
+  gradient_accumulation_steps: 1
+  head_warmup_epochs: 0
+  output_dir: runs/foundation_transfer_a2_l2sp

@@ -1,0 +1,21 @@
+base_config: downstream_transfer_stable.yaml
+
+experiment:
+  name: foundation_transfer_a3_crop
+
+data:
+  random_crop:
+    # The ONLY training-policy change from the recovered baseline (0.5).
+    # Keep jitter=24, retention target=0.70 and attempts=16 inherited.
+    tumor_guided_probability: 1.0
+    # Observational only: audit actual crops without extra random draws.
+    audit: true
+
+training:
+  # Explicitly pin the baseline defaults; do not inherit A1 or A2.
+  gradient_accumulation_steps: 1
+  head_warmup_epochs: 0
+  mae_anchor:
+    enabled: false
+    weight: 0.0
+  output_dir: runs/foundation_transfer_a3_crop

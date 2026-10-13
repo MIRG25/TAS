@@ -1,0 +1,38 @@
+base_config: source_initialized_spatial_adapter.yaml
+
+experiment:
+  name: source_patient_contrast_spatial_v1
+  description: Source supervision with label-free patient contrast, followed by unchanged spatial target adaptation
+
+# The only learning change relative to the spatial baseline is in SOURCE
+# training. All target tasks use the same unchanged spatial-adapter protocol.
+source_training:
+  output_dir: runs/source_patient_contrast_learning
+  checkpoint_policy: best-only
+  mae_token_retention_weight: 0.0
+  refit_on_full_source_budget: false
+  patient_contrast:
+    enabled: true
+    weight: 0.05
+    projection_dim: 128
+    queue_size: 256
+    temperature: 0.2
+    momentum: 0.99
+    gain_range: 0.1
+    offset_std: 0.05
+    noise_std: 0.02
+
+adaptation:
+  output_dir: runs/source_initialized_adaptation_patient_contrast
+  checkpoint_policy: best-only
+  target_source_bridge: false
+  head_warmstart_epochs: 0
+  target_spatial_adapter: true
+  target_pooling: mean
+  target_mae_bypass: false
+  source_residuals: false
+  target_private_blocks: 2
+  target_initialization: source-shared
+  label_fraction: 1.0
+  label_seed: 2028
+  refit_on_full_label_budget: false

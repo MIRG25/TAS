@@ -1,0 +1,12 @@
+base_config: source_guided_transfer.yaml
+
+experiment:
+  name: source_guided_transfer_private2
+
+# Task-general capacity expansion.  Every unseen endpoint receives an isolated
+# copy of the final two MAE Transformer blocks.  The source encoder, source
+# adapters, and all existing task heads remain frozen and bitwise unchanged.
+adaptation:
+  target_private_blocks: 2
+  target_block_learning_rate: 0.00001
+  output_dir: runs/source_guided_adaptation_private2

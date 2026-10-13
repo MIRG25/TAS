@@ -1,0 +1,6 @@
+base_config: ../local_gpu.yaml
+experiment:
+  name: baseline_single_who
+training:
+  tasks: [who]
+

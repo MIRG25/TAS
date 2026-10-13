@@ -1,0 +1,62 @@
+base_config: ../local_gpu.yaml
+
+experiment:
+  name: foundation_transfer
+
+data:
+  cache_dir: artifacts/cache_full240x240x155
+  cache_shape: [155, 240, 240]
+  crop_shape: [128, 128, 128]
+  random_crop:
+    enabled: true
+    tumor_guided_probability: 0.5
+    min_tumor_retention: 0.70
+    tumor_center_jitter_voxels: 24
+    min_brain_fraction: 0.20
+    attempts: 16
+
+model:
+  image_size: [128, 128, 128]
+  patch_size: [16, 16, 16]
+  in_channels: 4
+  embed_dim: 384
+  depth: 12
+  num_heads: 6
+  mlp_ratio: 4.0
+  dropout: 0.0
+  gradient_checkpointing: true
+  pooling: mean
+  use_feature_adapter: false
+  adapter_dim: 96
+  pretrained_checkpoint: runs/foundation_mae_base/best.pt
+
+training:
+  require_cuda: true
+  seed: 2026
+  epochs: 200
+  batch_size: 2
+  transfer_mode: full-finetune
+  label_fraction: 1.0
+  label_seed: 2028
+  head_learning_rate: 0.0001
+  pretrained_encoder_learning_rate: 0.00001
+  random_encoder_learning_rate: 0.0001
+  minimum_learning_rate_factor: 0.01
+  warmup_epochs: 5
+  weight_decay: 0.05
+  max_grad_norm: 5.0
+  amp: true
+  checkpoint_interval: 25
+  # Select the training duration on the inner validation split, then restart
+  # from the same MAE initialization and fit every patient in the declared
+  # target-label budget before evaluating the untouched outer test fold.
+  refit_on_full_label_budget: true
+  refit_log_interval: 5
+  output_dir: runs/foundation_transfer
+
+validation:
+  interval: 1
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 30
+  min_epochs: 30
+  min_delta: 0.0001

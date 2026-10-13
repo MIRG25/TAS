@@ -1,0 +1,34 @@
+base_config: source_guided_transfer_binary_who_private2.yaml
+
+experiment:
+  name: source_initialized_transfer_v1
+
+# Create this once with scripts.prepare_transfer_protocol. Never substitute a
+# full-budget-refit source checkpoint from the legacy gated experiments.
+protocol:
+  path: artifacts/dataset_who_binary/transfer_protocol.json
+
+data:
+  random_crop:
+    tumor_guided_probability: 1.0
+
+training:
+  isolate_loader_rng: true
+
+source_training:
+  refit_on_full_source_budget: false
+  output_dir: runs/source_initialized_learning
+
+adaptation:
+  # --target-initialization fresh is the capacity/optimizer-matched MAE control.
+  target_initialization: source-shared
+  source_residuals: false
+  initial_source_gate: 0.0
+  gate_sparsity_weight: 0.0
+  safe_transfer:
+    enabled: false
+    source_path_dropout: 0.0
+    source_scale_candidates: [0.0]
+  label_fraction: 0.20
+  refit_on_full_label_budget: false
+  output_dir: runs/source_initialized_adaptation

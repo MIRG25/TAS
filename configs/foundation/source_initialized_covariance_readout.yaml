@@ -1,0 +1,10 @@
+# Single architecture ablation against the completed voxel baseline, not SAM.
+base_config: source_initialized_voxel_tokenizer.yaml
+
+experiment:
+  name: source_initialized_covariance_readout_v1
+
+adaptation:
+  target_covariance_readout: true
+  covariance_rank: 32
+  output_dir: runs/source_initialized_adaptation_covariance_readout

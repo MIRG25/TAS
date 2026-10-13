@@ -1,0 +1,14 @@
+base_config: source_initialized_spatial_adapter.yaml
+
+experiment:
+  name: source_initialized_spatial_source_bridge_v1
+
+# Inherit the user's most complete spatial-adapter experiment, including crop
+# probability 0.5, 2 copied blocks, mean pooling, and all optimizer settings.
+# Only the new patient-conditioned source-knowledge bridge changes the graph.
+adaptation:
+  head_warmstart_epochs: 0
+  target_source_bridge: true
+  source_bridge_dim: 64
+  checkpoint_policy: best-only
+  output_dir: runs/source_initialized_adaptation_source_bridge

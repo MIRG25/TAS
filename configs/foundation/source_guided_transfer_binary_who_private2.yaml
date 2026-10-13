@@ -1,0 +1,19 @@
+base_config: source_guided_transfer_private2.yaml
+
+experiment:
+  name: source_guided_transfer_binary_who_private2
+
+# Keep the established IDH loss unchanged. The binary WHO endpoint uses milder
+# square-root inverse-frequency weighting because its 80% grade-4 prevalence
+# would otherwise dominate a raw-accuracy objective.
+training:
+  class_weight_power: {idh: 1.0, who: 0.5}
+
+source_training:
+  output_dir: runs/source_guided_learning_who_binary
+
+adaptation:
+  output_dir: runs/source_guided_adaptation_who_binary_private2
+
+validation:
+  selection_metrics: {idh: auc, who: auc, survival: c_index}

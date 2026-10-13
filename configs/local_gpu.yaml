@@ -1,0 +1,9 @@
+# RTX 3090 Ti workstation overrides. Common settings live in default.yaml.
+base_config: default.yaml
+
+data:
+  num_workers: 4
+
+training:
+  batch_size: 2
+  amp: true

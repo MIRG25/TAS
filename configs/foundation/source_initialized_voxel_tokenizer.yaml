@@ -1,0 +1,23 @@
+base_config: source_initialized_spatial_adapter.yaml
+
+experiment:
+  name: source_initialized_voxel_tokenizer_v1
+
+# Original reference seed, not the separate 2027 repeat experiment.
+# Label/patient split seeds remain unchanged.
+training:
+  seed: 2026
+
+# Reuse ORIGINAL supervised source weights, not patient-contrast or retention.
+source_training:
+  patient_contrast:
+    enabled: false
+
+adaptation:
+  # Preserve the original objective; the fixed-patient CE ablation is paused.
+  classification_loss_reduction: batch-weight-mean
+  target_voxel_tokenizer: true
+  target_source_bridge: false
+  head_warmstart_epochs: 0
+  checkpoint_policy: best-only
+  output_dir: runs/source_initialized_adaptation_voxel_tokenizer

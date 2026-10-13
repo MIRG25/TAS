@@ -1,0 +1,11 @@
+base_config: source_initialized_voxel_tokenizer.yaml
+
+experiment:
+  name: source_initialized_voxel_sam_v1
+
+adaptation:
+  # A single prespecified candidate across all tasks/folds, not test-selected.
+  sam:
+    enabled: true
+    rho: 0.05
+  output_dir: runs/source_initialized_adaptation_voxel_sam

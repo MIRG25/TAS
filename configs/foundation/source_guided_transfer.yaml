@@ -1,0 +1,98 @@
+base_config: ../local_gpu.yaml
+
+experiment:
+  name: source_guided_transfer
+
+data:
+  cache_dir: artifacts/cache_full240x240x155
+  cache_shape: [155, 240, 240]
+  crop_shape: [128, 128, 128]
+  random_crop:
+    enabled: true
+    tumor_guided_probability: 0.5
+    min_tumor_retention: 0.70
+    tumor_center_jitter_voxels: 24
+    min_brain_fraction: 0.20
+    attempts: 16
+
+model:
+  image_size: [128, 128, 128]
+  patch_size: [16, 16, 16]
+  in_channels: 4
+  embed_dim: 384
+  depth: 12
+  num_heads: 6
+  mlp_ratio: 4.0
+  dropout: 0.0
+  gradient_checkpointing: true
+  pooling: mean
+  survival_bins: 12
+  adapter_dim: 96
+  private_adapter_dim: 96
+  pretrained_checkpoint: runs/foundation_mae_base/best.pt
+
+training:
+  require_cuda: true
+  seed: 2026
+  batch_size: 2
+  amp: true
+
+source_training:
+  source_tasks: [idh, who]
+  held_out_task: survival
+  epochs: 200
+  shared_adapter_learning_rate: 0.0001
+  private_adapter_learning_rate: 0.0001
+  head_learning_rate: 0.0001
+  task_loss_weights: {idh: 1.0, who: 1.0, survival: 1.0}
+  # Set to none for the loss-sum ablation; diagnostics are still recorded.
+  gradient_surgery: pcgrad
+  orthogonality_weight: 0.01
+  weight_decay: 0.05
+  warmup_epochs: 5
+  minimum_learning_rate_factor: 0.01
+  max_grad_norm: 5.0
+  checkpoint_interval: 25
+  refit_on_full_source_budget: true
+  refit_log_interval: 5
+  output_dir: runs/source_guided_learning
+
+adaptation:
+  target_task: survival
+  label_fraction: 1.0
+  label_seed: 2028
+  # Capacity ablation. Zero reproduces the original frozen-encoder target
+  # adapter; positive values copy that many final MAE blocks per unseen task.
+  target_private_blocks: 0
+  target_block_learning_rate: 0.00001
+  # Exact safe fallback: at zero the target path is identical to a raw-MAE
+  # deep adapter. Signed tanh gates may open only when target labels support it.
+  initial_source_gate: 0.0
+  gate_sparsity_weight: 0.001
+  # Train a usable null-source path and let only the inner validation split
+  # decide whether/how strongly frozen source knowledge is used. The outer
+  # test fold is evaluated only after this scale and the epoch are fixed.
+  safe_transfer:
+    enabled: true
+    source_path_dropout: 0.5
+    source_scale_candidates: [0.0, 0.5, 1.0]
+    minimum_source_gain: 0.005
+  epochs: 200
+  target_adapter_learning_rate: 0.0001
+  gate_learning_rate: 0.001
+  head_learning_rate: 0.0001
+  weight_decay: 0.05
+  warmup_epochs: 5
+  minimum_learning_rate_factor: 0.01
+  max_grad_norm: 5.0
+  checkpoint_interval: 25
+  refit_on_full_label_budget: true
+  refit_log_interval: 5
+  output_dir: runs/source_guided_adaptation_safe_calibrated
+
+validation:
+  interval: 1
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 30
+  min_epochs: 30
+  min_delta: 0.0001

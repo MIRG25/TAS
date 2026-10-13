@@ -1,0 +1,17 @@
+base_config: unseen_task_transfer.yaml
+
+experiment:
+  name: unseen_task_transfer_anchor
+
+source_training:
+  output_dir: runs/source_task_learning_anchor
+  mae_anchor:
+    enabled: true
+    weight: 10.0
+  gradient_diagnostics:
+    enabled: true
+    interval: 1
+    batches_per_epoch: 1
+
+adaptation:
+  output_dir: runs/unseen_task_adaptation_anchor

@@ -1,0 +1,17 @@
+# Same voxel + spatial network and corrected endpoint loss as endpoint-v2.
+# Base for the new WHO endpoint/protocol. run_cross_depth_transfer --who-low-high
+# explicitly adds the unchanged target cross-depth module to this base.
+base_config: source_initialized_endpoint_v2.yaml
+
+experiment:
+  name: source_initialized_who_low_high_v1
+
+protocol:
+  path: artifacts/dataset_who_low_high/transfer_protocol.json
+
+source_training:
+  output_dir: runs/source_initialized_learning_who_low_high
+
+adaptation:
+  label_fraction: 1.0
+  output_dir: runs/source_initialized_adaptation_who_low_high

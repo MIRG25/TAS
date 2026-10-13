@@ -1,0 +1,7 @@
+# Single-factor probe against source_initialized_transfer.yaml (tumor crop 1.0).
+# Keep the source checkpoint, data split, seed, head/block learning rates,
+# training schedule, and early stopping unchanged. Use a separate output dir.
+base_config: source_initialized_transfer.yaml
+
+adaptation:
+  target_adapter_learning_rate: 0.00003

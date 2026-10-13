@@ -1,0 +1,23 @@
+base_config: downstream_transfer_stable.yaml
+
+experiment:
+  name: foundation_transfer_a1
+
+data:
+  # Every supervised view must retain the tumour phenotype that defines all
+  # three endpoints. Jitter still exposes different tumour/peritumour context.
+  random_crop:
+    enabled: true
+    tumor_guided_probability: 1.0
+    min_tumor_retention: 0.70
+    tumor_center_jitter_voxels: 24
+    min_brain_fraction: 0.20
+    attempts: 16
+
+training:
+  # RTX 3090-class GPUs retain micro-batch 2; accumulation lowers gradient
+  # variance without increasing activation memory.
+  gradient_accumulation_steps: 8
+  # Fit the random endpoint head before allowing gradients into the MAE encoder.
+  head_warmup_epochs: 5
+  output_dir: runs/foundation_transfer_a1

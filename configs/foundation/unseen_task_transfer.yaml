@@ -1,0 +1,81 @@
+base_config: ../local_gpu.yaml
+
+experiment:
+  name: unseen_task_transfer
+
+data:
+  cache_dir: artifacts/cache_full240x240x155
+  cache_shape: [155, 240, 240]
+  crop_shape: [128, 128, 128]
+  random_crop:
+    enabled: true
+    tumor_guided_probability: 0.5
+    min_tumor_retention: 0.70
+    tumor_center_jitter_voxels: 24
+    min_brain_fraction: 0.20
+    attempts: 16
+
+model:
+  image_size: [128, 128, 128]
+  patch_size: [16, 16, 16]
+  in_channels: 4
+  embed_dim: 384
+  depth: 12
+  num_heads: 6
+  mlp_ratio: 4.0
+  dropout: 0.0
+  gradient_checkpointing: true
+  pooling: mean
+  use_feature_adapter: false
+  adapter_dim: 96
+  pretrained_checkpoint: runs/foundation_mae_base/best.pt
+
+training:
+  require_cuda: true
+  seed: 2026
+  batch_size: 2
+  amp: true
+
+source_training:
+  source_tasks: [idh, who]
+  held_out_task: survival
+  epochs: 200
+  encoder_learning_rate: 0.00001
+  head_learning_rate: 0.0001
+  task_loss_weights: {idh: 1.0, who: 1.0, survival: 1.0}
+  mae_anchor:
+    enabled: false
+    weight: 10.0
+  gradient_diagnostics:
+    enabled: false
+    interval: 1
+    batches_per_epoch: 1
+  weight_decay: 0.05
+  warmup_epochs: 5
+  minimum_learning_rate_factor: 0.01
+  max_grad_norm: 5.0
+  checkpoint_interval: 25
+  output_dir: runs/source_task_learning
+
+adaptation:
+  target_task: survival
+  mode: adapter
+  label_fraction: 1.0
+  label_seed: 2028
+  epochs: 200
+  encoder_learning_rate: 0.00001
+  adapter_learning_rate: 0.0001
+  head_learning_rate: 0.0001
+  weight_decay: 0.05
+  warmup_epochs: 5
+  minimum_learning_rate_factor: 0.01
+  max_grad_norm: 5.0
+  checkpoint_interval: 25
+  output_dir: runs/unseen_task_adaptation
+
+validation:
+  interval: 1
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 30
+  min_epochs: 30
+  min_delta: 0.0001

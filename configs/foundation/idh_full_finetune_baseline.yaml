@@ -1,0 +1,19 @@
+base_config: downstream_transfer.yaml
+
+experiment:
+  name: idh_full_finetune_baseline
+
+training:
+  transfer_mode: full-finetune
+  label_fraction: 1.0
+  # Preserve the established IDH weighted-CE definition; this baseline changes
+  # no decision threshold and does not use source-task supervision.
+  class_weight_power: {idh: 1.0, who: 0.5}
+  # Use the actual validation-selected checkpoint for the initial benchmark.
+  # Restarting on all outer-training patients changes the optimization path and
+  # obscures whether the base IDH pipeline itself reproduces prior performance.
+  refit_on_full_label_budget: false
+  output_dir: runs/idh_full_finetune_baseline
+
+validation:
+  selection_metrics: {idh: auc, who: auc, survival: c_index}

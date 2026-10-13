@@ -1,0 +1,53 @@
+experiment:
+  name: foundation_mae_base
+
+data:
+  split_manifest: artifacts/foundation_split/pretraining_split.csv
+  crop_shape: [128, 128, 128]
+  tumor_guided_probability: 0.5
+  tumor_center_jitter_voxels: 24
+  min_brain_fraction: 0.20
+  random_crop_attempts: 8
+  flip_probability: 0.5
+  num_workers: 4
+  prefetch_factor: 2
+  persistent_workers: true
+
+model:
+  image_size: [128, 128, 128]
+  patch_size: [16, 16, 16]
+  in_channels: 4
+  embed_dim: 384
+  depth: 12
+  num_heads: 6
+  decoder_embed_dim: 192
+  decoder_depth: 4
+  decoder_num_heads: 6
+  mlp_ratio: 4.0
+  norm_pix_loss: true
+  dropout: 0.0
+  gradient_checkpointing: true
+
+training:
+  seed: 2026
+  require_cuda: true
+  epochs: 400
+  batch_size: 2
+  gradient_accumulation_steps: 8
+  mask_ratio: 0.75
+  learning_rate: 0.0001
+  min_learning_rate: 0.000001
+  warmup_epochs: 20
+  weight_decay: 0.05
+  beta1: 0.9
+  beta2: 0.95
+  max_grad_norm: 1.0
+  amp: true
+  validation_interval: 1
+  validation_mask_seed: 2027
+  log_interval_batches: 25
+  checkpoint_interval: 25
+  early_stopping_patience: 60
+  minimum_epochs: 150
+  minimum_delta: 0.0001
+  output_dir: runs/foundation_mae_base

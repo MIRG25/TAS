@@ -1,0 +1,49 @@
+base_config: source_initialized_transfer.yaml
+
+experiment:
+  name: source_initialized_all_blocks_v1
+
+# The original source-shared baseline. Only target block update depth changes.
+data:
+  random_crop:
+    tumor_guided_probability: 0.5
+
+training:
+  batch_size: 2
+
+source_training:
+  mae_token_retention_weight: 0.0
+  refit_on_full_source_budget: false
+  checkpoint_interval: 200
+  output_dir: runs/source_initialized_learning
+
+adaptation:
+  expected_source_crop_probability: 0.5
+  target_initialization: source-shared
+  source_residuals: false
+  target_pooling: mean
+  target_mae_bypass: false
+  target_spatial_adapter: false
+  # All 12 copied Transformer blocks, NOT the shared patch embedding/final norm.
+  # Source adapters/heads and original MAE remain frozen and unmodified.
+  target_private_blocks: 12
+  target_adapter_learning_rate: 0.0001
+  target_block_learning_rate: 0.00001
+  head_learning_rate: 0.0001
+  weight_decay: 0.05
+  epochs: 200
+  warmup_epochs: 5
+  label_fraction: 1.0
+  label_seed: 2028
+  refit_on_full_label_budget: false
+  # Keep a self-contained inference checkpoint, no optimizer/last/epoch copies.
+  # This deliberately does not support exact training resumption.
+  checkpoint_policy: best-only
+  output_dir: runs/source_initialized_adaptation_all_blocks
+
+validation:
+  interval: 1
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 30
+  min_epochs: 30
+  min_delta: 0.0001

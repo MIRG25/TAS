@@ -1,0 +1,24 @@
+base_config: downstream_transfer.yaml
+
+experiment:
+  name: foundation_transfer_recovered_baseline
+
+training:
+  # Recovered reference protocol: do not attenuate early encoder blocks.
+  layerwise_lr_decay: 1.0
+  # Keep the recovered reference run identical to the established raw-model
+  # baseline. EMA remains supported in code as an isolated future ablation.
+  ema:
+    enabled: false
+    decay: 0.995
+    validation_policy: raw
+  # Evaluate the exact validation-selected raw checkpoint. A restart on the
+  # complete label budget follows a different stochastic path.
+  refit_on_full_label_budget: false
+  class_weight_power: {idh: 1.0, who: 0.5}
+  output_dir: runs/foundation_transfer_recovered_baseline
+
+validation:
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 30
+  min_epochs: 30

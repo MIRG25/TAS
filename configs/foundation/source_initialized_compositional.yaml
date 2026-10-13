@@ -1,0 +1,36 @@
+base_config: source_initialized_voxel_tokenizer.yaml
+
+experiment:
+  name: source_initialized_compositional_v1
+
+model:
+  compositional_adapter:
+    enabled: true
+    components: 4
+
+training:
+  seed: 2026
+
+source_training:
+  checkpoint_policy: best-only
+  refit_on_full_source_budget: false
+  output_dir: runs/source_compositional_learning
+
+adaptation:
+  # Source component weights are immutable; optimize target composition,
+  # spatial mixing, voxel stem, two private MAE blocks and target head.
+  target_initialization: source-shared
+  source_residuals: false
+  target_private_blocks: 2
+  target_pooling: mean
+  target_spatial_adapter: true
+  target_voxel_tokenizer: true
+  target_covariance_readout: false
+  target_source_bridge: false
+  target_mae_bypass: false
+  head_warmstart_epochs: 0
+  sam:
+    enabled: false
+  checkpoint_policy: best-only
+  refit_on_full_label_budget: false
+  output_dir: runs/source_compositional_adaptation

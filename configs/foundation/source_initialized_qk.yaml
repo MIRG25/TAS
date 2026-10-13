@@ -1,0 +1,19 @@
+base_config: source_initialized_voxel_tokenizer.yaml
+
+experiment:
+  name: source_initialized_qk_v1
+
+model:
+  qk_adapter:
+    enabled: true
+    rank: 8
+
+source_training:
+  checkpoint_policy: best-only
+  refit_on_full_source_budget: false
+  output_dir: runs/source_qk_learning
+
+adaptation:
+  checkpoint_policy: best-only
+  refit_on_full_label_budget: false
+  output_dir: runs/source_qk_adaptation

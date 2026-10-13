@@ -1,0 +1,17 @@
+base_config: source_initialized_attention_pool.yaml
+
+experiment:
+  name: source_initialized_token_retention_v1
+
+# Single source-objective change; retain the attention comparison's crop=0.5,
+# patient protocol, source optimizers, label budget and target adaptation.
+source_training:
+  # Mean 1-cosine over same-crop final spatial tokens, excluding CLS.
+  # Fixed development weight, not selected using outer-test performance.
+  # Set to 0.0 to recover the original source-training graph and compute cost.
+  mae_token_retention_weight: 0.1
+  output_dir: runs/source_initialized_learning_token_retention
+
+adaptation:
+  target_mae_bypass: false
+  output_dir: runs/source_initialized_adaptation_token_retention

@@ -1,0 +1,6 @@
+base_config: ../local_gpu.yaml
+experiment:
+  name: baseline_source_multitask
+  description: Ordinary supervised IDH and WHO multi-task baseline
+training:
+  tasks: [idh, who]

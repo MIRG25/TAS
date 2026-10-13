@@ -1,0 +1,16 @@
+base_config: source_initialized_voxel_tokenizer.yaml
+
+# Full three-direction endpoint-loss correction. Original voxel config stays
+# legacy-v1. Sources containing survival MUST be trained with endpoint-v2.
+experiment:
+  name: source_initialized_endpoint_v2_all_tasks
+
+model:
+  survival_loss_version: endpoint-v2
+
+source_training:
+  checkpoint_policy: best-only
+  output_dir: runs/source_initialized_learning_endpoint_v2
+
+adaptation:
+  output_dir: runs/source_initialized_adaptation_endpoint_v2

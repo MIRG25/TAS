@@ -1,0 +1,18 @@
+base_config: source_initialized_transfer.yaml
+
+experiment:
+  name: source_initialized_attention_pool_v1
+
+# Compare with the ORIGINAL source-shared five-fold run (mean C=0.6861),
+# not the later tumor-crop=1 or reduced-adapter-LR experiments.
+# This explicitly restores its crop policy; all other learning choices inherit.
+data:
+  random_crop:
+    tumor_guided_probability: 0.5
+
+adaptation:
+  target_pooling: attention
+  # A single zero-initialized 384->1 score, with no softmax-cancelling bias.
+  # Same LR/weight decay as the target head, no new tuning parameters.
+  label_fraction: 1.0
+  output_dir: runs/source_initialized_adaptation_attention_pool

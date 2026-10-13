@@ -1,0 +1,11 @@
+base_config: downstream_transfer_a1.yaml
+
+experiment:
+  name: foundation_transfer_a1_accum4
+
+training:
+  # A1 with a less aggressive accumulation factor.  The original A1 used
+  # accumulation=8 (only 20 optimizer updates per epoch); accumulation=4
+  # retains variance reduction while doubling the number of parameter updates.
+  gradient_accumulation_steps: 4
+  output_dir: runs/foundation_transfer_a1_accum4

@@ -1,0 +1,10 @@
+base_config: source_initialized_attention_pool.yaml
+
+experiment:
+  name: source_initialized_attention_mae_bypass_v1
+
+# Single change relative to attention_pool_v1: give the target head access to
+# the same crop's frozen, spatial-mean MAE features. No extra tunable loss/gate.
+adaptation:
+  target_mae_bypass: true
+  output_dir: runs/source_initialized_adaptation_mae_bypass

@@ -1,0 +1,30 @@
+# Full-budget, same-patient-protocol MAE single-task performance reference.
+# Inherit data/model/evaluation settings from the current transfer experiment.
+base_config: source_initialized_transfer.yaml
+
+experiment:
+  name: foundation_full_finetune_control
+
+training:
+  transfer_mode: full-finetune
+  label_fraction: 1.0
+  label_seed: 2028
+  epochs: 200
+  pretrained_encoder_learning_rate: 0.00001
+  head_learning_rate: 0.0001
+  weight_decay: 0.05
+  warmup_epochs: 5
+  minimum_learning_rate_factor: 0.01
+  max_grad_norm: 5.0
+  checkpoint_interval: 25
+  layerwise_lr_decay: 1.0
+  gradient_accumulation_steps: 1
+  head_warmup_epochs: 0
+  ema:
+    enabled: false
+    validation_policy: raw
+  mae_anchor:
+    enabled: false
+    weight: 0.0
+  refit_on_full_label_budget: false
+  output_dir: runs/foundation_full_finetune_control

@@ -1,0 +1,49 @@
+base_config: source_initialized_transfer.yaml
+
+experiment:
+  name: source_initialized_head_warmstart_v1
+
+# Return to the original source-shared two-block architecture and crop rule.
+data:
+  random_crop:
+    tumor_guided_probability: 0.5
+
+training:
+  batch_size: 2
+
+source_training:
+  mae_token_retention_weight: 0.0
+  refit_on_full_source_budget: false
+  checkpoint_interval: 200
+  output_dir: runs/source_initialized_learning
+
+adaptation:
+  expected_source_crop_probability: 0.5
+  target_initialization: source-shared
+  source_residuals: false
+  target_pooling: mean
+  target_mae_bypass: false
+  target_spatial_adapter: false
+  target_private_blocks: 2
+  # Stage 1: only the new target head learns, for a fixed five epochs.
+  head_warmstart_epochs: 5
+  # Stage 2 retains the fitted head and updates it with adapters + two blocks.
+  target_adapter_learning_rate: 0.0001
+  target_block_learning_rate: 0.00001
+  head_learning_rate: 0.0001
+  weight_decay: 0.05
+  epochs: 200
+  # This is stage-2 LR warmup, NOT the preceding head-only stage.
+  warmup_epochs: 5
+  label_fraction: 1.0
+  label_seed: 2028
+  refit_on_full_label_budget: false
+  checkpoint_policy: best-only
+  output_dir: runs/source_initialized_adaptation_head_warmstart
+
+validation:
+  interval: 1
+  selection_metrics: {idh: auc, who: auc, survival: c_index}
+  early_stopping_patience: 30
+  min_epochs: 30
+  min_delta: 0.0001
